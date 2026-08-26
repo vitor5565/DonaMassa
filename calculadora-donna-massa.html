@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donna Massa — Calculadora de Custo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --cream:#FFFBF2;
+    --paper:#FFF6E8;
+    --ink:#3A2A1E;
+    --ink-soft:#7A6A5C;
+    --pink:#C4738A;
+    --green:#4A7856;
+    --gold:#C98A1F;
+    --line:#E9DFC9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    padding-bottom:140px;
+  }
+  header{
+    padding:28px 20px 20px;
+    text-align:center;
+    position:relative;
+  }
+  header::after{
+    content:"";
+    display:block;
+    width:64px;height:4px;
+    background:var(--pink);
+    border-radius:4px;
+    margin:14px auto 0;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.7rem;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    margin:6px 0 0;
+    color:var(--ink-soft);
+    font-size:0.88rem;
+  }
+  main{
+    max-width:520px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-bottom:14px;
+  }
+  .card h2{
+    font-family:'Fraunces',serif;
+    font-size:1.05rem;
+    font-weight:600;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.ing{background:var(--green);}
+  .dot.emb{background:var(--pink);}
+  .dot.ene{background:var(--gold);}
+
+  .item{
+    padding:12px 0;
+    border-top:1px solid var(--line);
+  }
+  .item:first-child{border-top:none;padding-top:2px;}
+  .item-name{
+    font-weight:600;
+    font-size:0.92rem;
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .item-cost{
+    font-family:'Fraunces',serif;
+    color:var(--green);
+    font-weight:600;
+  }
+  .row{
+    display:flex;
+    gap:8px;
+    margin-bottom:6px;
+  }
+  .field{
+    flex:1;
+    min-width:0;
+  }
+  .field label{
+    display:block;
+    font-size:0.68rem;
+    color:var(--ink-soft);
+    margin-bottom:3px;
+  }
+  input[type=number], select{
+    width:100%;
+    padding:8px 9px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    background:#fff;
+    font-family:'Work Sans',sans-serif;
+    font-size:0.88rem;
+    color:var(--ink);
+  }
+  input[type=number]:focus, select:focus{
+    outline:2px solid var(--pink);
+    outline-offset:1px;
+  }
+  .radios{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .radio-opt{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    background:#fff;
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  .radio-opt input{margin:0;accent-color:var(--pink);}
+  .radio-opt.active{
+    border-color:var(--pink);
+    background:#FDF0F3;
+  }
+  .hint{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+
+  #resumo-fixo{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background:var(--ink);
+    color:var(--cream);
+    padding:14px 18px 18px;
+    box-shadow:0 -6px 24px rgba(0,0,0,0.18);
+  }
+  .resumo-top{
+    max-width:520px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .resumo-label{font-size:0.72rem;color:#C9BDAE;text-transform:uppercase;letter-spacing:0.05em;}
+  .resumo-valor{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:#fff;}
+  .resumo-sub{font-size:0.75rem;color:#C9BDAE;margin-top:2px;}
+  #ring{flex-shrink:0;}
+  .calc-btn{
+    max-width:520px;
+    margin:14px auto 0;
+    display:block;
+    width:100%;
+    background:var(--green);
+    color:#fff;
+    border:none;
+    border-radius:11px;
+    padding:13px;
+    font-family:'Work Sans',sans-serif;
+    font-weight:700;
+    font-size:0.95rem;
+    cursor:pointer;
+  }
+  .calc-btn:active{opacity:0.85;}
+  .copy-btn{
+    max-width:520px;
+    margin:12px auto 0;
+    display:block;
+    width:100%;
+    background:var(--pink);
+    color:#fff;
+    border:none;
+    border-radius:11px;
+    padding:12px;
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:0.9rem;
+    cursor:pointer;
+  }
+  .copy-btn:active{opacity:0.85;}
+  .copy-btn.copied{background:var(--green);}
+
+  .breakdown{
+    max-width:520px;
+    margin:10px auto 0;
+    font-size:0.75rem;
+    color:#C9BDAE;
+    display:none;
+  }
+  .breakdown.open{display:block;}
+  .breakdown-row{display:flex;justify-content:space-between;padding:3px 0;border-top:1px solid #52453A;}
+  .toggle-details{
+    background:none;border:none;color:#C9BDAE;font-size:0.72rem;
+    text-decoration:underline;padding:6px 0 0;cursor:pointer;width:100%;text-align:center;
+  }
+  .settings-bar{
+    max-width:520px;
+    margin:0 auto 14px;
+    padding:0 16px;
+    display:flex;
+    gap:8px;
+  }
+  .settings-btn{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--ink);
+    border-radius:10px;
+    padding:9px 6px;
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:0.78rem;
+    cursor:pointer;
+  }
+  .settings-btn.save{
+    background:var(--green);
+    color:#fff;
+    border-color:var(--green);
+  }
+  .settings-msg{
+    max-width:520px;
+    margin:0 auto 10px;
+    padding:0 16px;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    text-align:center;
+    min-height:1em;
+  }
+  .backup-box{
+    max-width:520px;
+    margin:0 auto 14px;
+    padding:0 16px;
+    display:none;
+  }
+  .backup-box.open{display:block;}
+  .backup-box textarea{
+    width:100%;
+    height:70px;
+    font-size:0.7rem;
+    font-family:monospace;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:8px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .backup-box .row{margin-top:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Donna Massa</h1>
+  <p>Calculadora de custo do pudim — preencha o que você pagou</p>
+</header>
+
+<div class="settings-bar">
+  <button class="settings-btn save" id="saveDefaultsBtn">💾 Salvar valores atuais como padrão</button>
+</div>
+<div class="settings-bar">
+  <button class="settings-btn" id="resetDefaultsBtn">↩️ Restaurar padrões originais</button>
+  <button class="settings-btn" id="backupToggleBtn">🔒 Backup manual</button>
+</div>
+<div class="settings-msg" id="settingsMsg"></div>
+<div class="backup-box" id="backupBox">
+  <div class="hint" style="margin-bottom:4px;">Copie este texto e guarde (ex: nas Notas do celular). Se um dia o salvamento automático não funcionar, cole aqui e toque em "Importar" para recuperar os valores.</div>
+  <textarea id="backupText" readonly></textarea>
+  <div class="row">
+    <button class="settings-btn" id="importBackupBtn" style="flex:1;">📥 Importar texto acima</button>
+  </div>
+</div>
+
+<main>
+
+  <div class="card">
+    <h2>🍮 Rendimento da receita</h2>
+    <div class="row">
+      <div class="field">
+        <label>Copos por receita</label>
+        <input type="number" id="rendimento" value="6" min="1" step="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="dot ing"></span>Ingredientes</h2>
+
+    <div class="item">
+      <div class="item-name">Leite condensado <span class="item-cost" data-out="leiteCondensado">R$ 0,00</span></div>
+      <div class="row">
+        <div class="field"><label>Preço pago (lata de 395g)</label><input type="number" step="0.01" value="7.00" id="leiteCondensadoPreco"></div>
+      </div>
+      <div class="hint">A receita usa 365g de leite condensado.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-name">Leite integral <span class="item-cost" data-out="leiteIntegral">R$ 0,00</span></div>
+      <div class="row">
+        <div class="field"><label>Preço pago (caixa de 1L)</label><input type="number" step="0.01" value="6.00" id="leiteIntegralPreco"></div>
+      </div>
+      <div class="hint">A receita usa 365ml de leite integral.</div>
+    </div>
+
+    <div class="item" id="gemaItem">
+      <div class="item-name">Gemas <span class="item-cost" data-out="gemas">R$ 0,00</span></div>
+      <div class="radios" id="gemaRadios">
+        <label class="radio-opt active">
+          <input type="radio" name="gemaFormato" value="duzia" checked>
+          Dúzia (12 unidades)
+        </label>
+        <label class="radio-opt">
+          <input type="radio" name="gemaFormato" value="24">
+          Bandeja com 24 unidades
+        </label>
+        <label class="radio-opt">
+          <input type="radio" name="gemaFormato" value="pasteurizada">
+          Pasteurizada — pacote de 1 kg (≈17 g por gema)
+        </label>
+      </div>
+      <div class="row">
+        <div class="field"><label id="gemaPrecoLabel">Preço pago pela dúzia (R$)</label><input type="number" step="0.01" value="25.00" id="gemaPreco"></div>
+        <div class="field"><label>Gemas usadas na receita</label><input type="number" step="1" value="3" id="gemaUsadas"></div>
+      </div>
+      <div class="hint" id="gemaHint">R$ 25,00 ÷ 12 = R$ 2,08 por gema</div>
+    </div>
+
+    <div class="item">
+      <div class="item-name">Açúcar <span class="item-cost" data-out="acucar">R$ 0,00</span></div>
+      <div class="row">
+        <div class="field"><label>Preço pago (pacote de 1kg)</label><input type="number" step="0.01" value="5.50" id="acucarPreco"></div>
+      </div>
+      <div class="hint">A receita usa 300g de açúcar.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-name">Essência de baunilha <span class="item-cost" data-out="baunilha">R$ 0,00</span></div>
+      <div class="row">
+        <div class="field"><label>Preço pago (frasco de 30ml)</label><input type="number" step="0.01" value="12.00" id="baunilhaPreco"></div>
+      </div>
+      <div class="hint">A receita usa 0,5ml de essência.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-name">Água <span class="item-cost">R$ 0,00</span></div>
+      <div class="hint">Custo desprezível — não entra na conta.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="dot emb"></span>Embalagem</h2>
+
+    <div class="item">
+      <div class="item-name">Copos <span class="item-cost" data-out="copos">R$ 0,00</span></div>
+      <div class="row">
+        <div class="field"><label>Preço pago (pacote de 50 un.)</label><input type="number" step="0.01" value="85.00" id="coposPreco"></div>
+      </div>
+      <div class="hint">Usa-se 1 copo por pudim.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-name">Tampas <span class="item-cost" data-out="tampas">R$ 0,00</span></div>
+      <div class="row">
+        <div class="field"><label>Preço pago (pacote de 50 un.)</label><input type="number" step="0.01" value="69.50" id="tampasPreco"></div>
+      </div>
+      <div class="hint">Usa-se 1 tampa por pudim.</div>
+    </div>
+
+    <div class="item">
+      <div class="item-name">Adesivos <span class="item-cost" data-out="adesivos">R$ 0,00</span></div>
+      <div class="row">
+        <div class="field"><label>Custo de adesivo por copo (R$)</label><input type="number" step="0.01" value="1.27" id="adesivoFixo"></div>
+      </div>
+      <div class="hint">Fixo: 2 adesivos × R$ 0,635 = R$ 1,27 por copo.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="dot ene"></span>Energia do forno</h2>
+    <div class="row">
+      <div class="field">
+        <label>Custo de energia por receita (R$)</label>
+        <input type="number" step="0.01" value="5.71" id="energia">
+      </div>
+    </div>
+    <div class="hint">Valor conservador (potência máxima do forno por 2h). Recalcule na conta de luz se a tarifa mudar.</div>
+  </div>
+
+</main>
+
+<div id="resumo-fixo">
+  <div class="resumo-top">
+    <div>
+      <div class="resumo-label">Custo por pudim</div>
+      <div class="resumo-valor" id="custoUnitario">R$ 0,00</div>
+      <div class="resumo-sub" id="custoTotalReceita">Total da receita: R$ 0,00</div>
+    </div>
+    <svg id="ring" width="72" height="72" viewBox="0 0 72 72"></svg>
+  </div>
+  <button class="calc-btn" id="calcBtn">🔄 Calcular</button>
+  <button class="toggle-details" id="toggleBtn">ver detalhamento por item</button>
+  <div class="breakdown" id="breakdown"></div>
+  <button class="copy-btn" id="copyBtn">📋 Copiar resumo para WhatsApp</button>
+</div>
+
+<script>
+const fmt = (v) => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+
+function fixedCost(id, packsize, used){
+  const price = parseFloat(document.getElementById(id).value) || 0;
+  return (price / packsize) * used;
+}
+
+function gemaCost(){
+  const formato = document.querySelector('input[name=gemaFormato]:checked').value;
+  const preco = parseFloat(document.getElementById('gemaPreco').value) || 0;
+  const usadas = parseFloat(document.getElementById('gemaUsadas').value) || 0;
+  let porGema = 0, hint = '';
+  if(formato === 'duzia'){
+    porGema = preco / 12;
+    hint = `${fmt(preco)} ÷ 12 = ${fmt(porGema)} por gema`;
+  } else if(formato === '24'){
+    porGema = preco / 24;
+    hint = `${fmt(preco)} ÷ 24 = ${fmt(porGema)} por gema`;
+  } else {
+    const gemasPorKg = 1000 / 17;
+    porGema = preco / gemasPorKg;
+    hint = `${fmt(preco)} ÷ ${gemasPorKg.toFixed(1)} gemas (17g cada) = ${fmt(porGema)} por gema`;
+  }
+  document.getElementById('gemaHint').textContent = hint;
+  return porGema * usadas;
+}
+
+function drawRing(ing, emb, ene, total){
+  const svg = document.getElementById('ring');
+  const r = 28, cx = 36, cy = 36, circ = 2*Math.PI*r;
+  const segs = [
+    {v: ing, color: 'var(--green)'.replace('var(--green)','#4A7856')},
+    {v: emb, color: '#C4738A'},
+    {v: ene, color: '#C98A1F'}
+  ];
+  let offset = 0;
+  let circles = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#52453A" stroke-width="9"/>`;
+  segs.forEach(s=>{
+    const frac = total > 0 ? s.v/total : 0;
+    const len = frac*circ;
+    circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="9"
+      stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-offset}"
+      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`;
+    offset += len;
+  });
+  svg.innerHTML = circles;
+}
+
+function recalc(){
+  const rendimento = parseFloat(document.getElementById('rendimento').value) || 1;
+
+  const leiteCondensado = fixedCost('leiteCondensadoPreco', 395, 365);
+  const leiteIntegral = fixedCost('leiteIntegralPreco', 1000, 365);
+  const gemas = gemaCost();
+  const acucar = fixedCost('acucarPreco', 1000, 300);
+  const baunilha = fixedCost('baunilhaPreco', 30, 0.5);
+
+  const copos = fixedCost('coposPreco', 50, 1) * rendimento;
+  const tampas = fixedCost('tampasPreco', 50, 1) * rendimento;
+  const adesivos = (parseFloat(document.getElementById('adesivoFixo').value) || 0) * rendimento;
+
+  const energia = parseFloat(document.getElementById('energia').value) || 0;
+
+  document.querySelector('[data-out=leiteCondensado]').textContent = fmt(leiteCondensado);
+  document.querySelector('[data-out=leiteIntegral]').textContent = fmt(leiteIntegral);
+  document.querySelector('[data-out=gemas]').textContent = fmt(gemas);
+  document.querySelector('[data-out=acucar]').textContent = fmt(acucar);
+  document.querySelector('[data-out=baunilha]').textContent = fmt(baunilha);
+  document.querySelector('[data-out=copos]').textContent = fmt(copos);
+  document.querySelector('[data-out=tampas]').textContent = fmt(tampas);
+  document.querySelector('[data-out=adesivos]').textContent = fmt(adesivos);
+
+  const ingredientesTotal = leiteCondensado + leiteIntegral + gemas + acucar + baunilha;
+  const embalagemTotal = copos + tampas + adesivos;
+  const total = ingredientesTotal + embalagemTotal + energia;
+  const porUnidade = total / rendimento;
+
+  document.getElementById('custoUnitario').textContent = fmt(porUnidade);
+  document.getElementById('custoTotalReceita').textContent = `Total da receita: ${fmt(total)}`;
+
+  drawRing(ingredientesTotal, embalagemTotal, energia, total);
+
+  const items = [
+    ['Leite condensado', leiteCondensado],
+    ['Leite integral', leiteIntegral],
+    ['Gemas', gemas],
+    ['Açúcar', acucar],
+    ['Essência de baunilha', baunilha],
+    ['Copos', copos],
+    ['Tampas', tampas],
+    ['Adesivos', adesivos],
+    ['Energia', energia],
+  ];
+  const breakdown = document.getElementById('breakdown');
+  breakdown.innerHTML = items.map(([name, v])=>{
+    const pct = total > 0 ? (v/total*100) : 0;
+    return `<div class="breakdown-row"><span>${name}</span><span>${fmt(v)} · ${pct.toFixed(1)}%</span></div>`;
+  }).join('');
+
+  window._resumoTexto = buildWhatsappText(rendimento, porUnidade, total, items);
+}
+
+function buildWhatsappText(rendimento, porUnidade, total, items){
+  let txt = `🍮 CUSTO POR PUDIM — ${fmt(porUnidade)}\n\n`;
+  const icons = {
+    'Leite condensado':'🥛','Leite integral':'🥛','Gemas':'🥚','Açúcar':'🍬',
+    'Essência de baunilha':'🌿','Copos':'📦','Tampas':'📦','Adesivos':'🏷️','Energia':'⚡'
+  };
+  items.forEach(([name, v])=>{
+    const pct = total > 0 ? (v/total*100) : 0;
+    txt += `${icons[name]||'•'} ${name} — ${fmt(v)} (${pct.toFixed(1)}%)\n`;
+  });
+  txt += `\nTOTAL DA RECEITA (${rendimento} pudins): ${fmt(total)}`;
+  return txt;
+}
+
+document.querySelectorAll('input, select').forEach(el=>{
+  el.addEventListener('input', recalc);
+});
+
+document.querySelectorAll('input[name=gemaFormato]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    document.querySelectorAll('#gemaRadios .radio-opt').forEach(o=>o.classList.remove('active'));
+    r.closest('.radio-opt').classList.add('active');
+    const label = document.getElementById('gemaPrecoLabel');
+    if(r.value === 'duzia') label.textContent = 'Preço pago pela dúzia (R$)';
+    else if(r.value === '24') label.textContent = 'Preço pago pela bandeja de 24 (R$)';
+    else label.textContent = 'Preço pago pelo pacote de 1kg (R$)';
+    recalc();
+  });
+});
+
+const STORAGE_KEY = 'donnaMassaPudimDefaults';
+
+const FIELD_IDS = [
+  'rendimento','leiteCondensadoPreco','leiteIntegralPreco','gemaPreco','gemaUsadas',
+  'acucarPreco','baunilhaPreco','coposPreco','tampasPreco','adesivoFixo','energia'
+];
+
+function collectValues(){
+  const data = {};
+  FIELD_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) data[id] = el.value;
+  });
+  const formatoEl = document.querySelector('input[name=gemaFormato]:checked');
+  data.gemaFormato = formatoEl ? formatoEl.value : 'duzia';
+  return data;
+}
+
+function applyValues(data){
+  if(!data) return;
+  FIELD_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el && data[id] !== undefined) el.value = data[id];
+  });
+  if(data.gemaFormato){
+    const radio = document.querySelector(`input[name=gemaFormato][value="${data.gemaFormato}"]`);
+    if(radio){
+      radio.checked = true;
+      document.querySelectorAll('#gemaRadios .radio-opt').forEach(o=>o.classList.remove('active'));
+      radio.closest('.radio-opt').classList.add('active');
+      const label = document.getElementById('gemaPrecoLabel');
+      if(data.gemaFormato === 'duzia') label.textContent = 'Preço pago pela dúzia (R$)';
+      else if(data.gemaFormato === '24') label.textContent = 'Preço pago pela bandeja de 24 (R$)';
+      else label.textContent = 'Preço pago pelo pacote de 1kg (R$)';
+    }
+  }
+}
+
+function showMsg(text){
+  const msg = document.getElementById('settingsMsg');
+  msg.textContent = text;
+  setTimeout(()=>{ if(msg.textContent === text) msg.textContent = ''; }, 3500);
+}
+
+function saveDefaults(){
+  const data = collectValues();
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    showMsg('✅ Padrões salvos neste celular — vão aparecer sozinhos da próxima vez que abrir.');
+  }catch(e){
+    showMsg('⚠️ Não deu pra salvar automaticamente aqui. Use o "Backup manual" abaixo.');
+  }
+}
+
+function loadDefaults(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) applyValues(JSON.parse(raw));
+  }catch(e){ /* nada salvo ainda — segue com os padrões do HTML */ }
+  recalc();
+}
+
+function resetDefaults(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  location.reload();
+}
+
+document.getElementById('saveDefaultsBtn').addEventListener('click', saveDefaults);
+document.getElementById('resetDefaultsBtn').addEventListener('click', resetDefaults);
+document.getElementById('backupToggleBtn').addEventListener('click', ()=>{
+  const box = document.getElementById('backupBox');
+  box.classList.toggle('open');
+  if(box.classList.contains('open')){
+    document.getElementById('backupText').value = JSON.stringify(collectValues());
+  }
+});
+document.getElementById('importBackupBtn').addEventListener('click', ()=>{
+  try{
+    const data = JSON.parse(document.getElementById('backupText').value);
+    applyValues(data);
+    recalc();
+    showMsg('✅ Valores importados do backup.');
+  }catch(e){
+    showMsg('⚠️ Texto de backup inválido.');
+  }
+});
+
+loadDefaults();
+
+document.getElementById('calcBtn').addEventListener('click', recalc);
+
+document.getElementById('toggleBtn').addEventListener('click', ()=>{
+  const b = document.getElementById('breakdown');
+  b.classList.toggle('open');
+  document.getElementById('toggleBtn').textContent = b.classList.contains('open') ? 'ocultar detalhamento' : 'ver detalhamento por item';
+});
+
+document.getElementById('copyBtn').addEventListener('click', ()=>{
+  navigator.clipboard.writeText(window._resumoTexto || '').then(()=>{
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = '📋 Copiar resumo para WhatsApp'; btn.classList.remove('copied'); }, 1800);
+  });
+});
+
+recalc();
+</script>
+
+</body>
+</html>
